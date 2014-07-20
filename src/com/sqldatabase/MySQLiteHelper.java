@@ -35,10 +35,14 @@ public class MySQLiteHelper {
  
     //private SQLiteDatabase mDb;
     private SQLiteDatabase mDb;
-    public DatabaseHelper mDbHelper;
+    private DatabaseHelper mDbHelper;
     private boolean open = false;
     private Context context;
     
+    
+    public SQLiteDatabase get_mDb(){
+    	return this.mDb;
+    }
     
     public static class DatabaseHelper extends SQLiteOpenHelper {
 	    
@@ -57,9 +61,8 @@ public class MySQLiteHelper {
 	        // Drop older table if existed
 	    	Log.e("OPEN", "upgrade");
 	        db.execSQL("DROP TABLE IF EXISTS measurements");
-//	        this.onCreate(db);
-	    }
-	   
+	        this.onCreate(db);
+	    }	   
 	    
     }
    
@@ -72,7 +75,7 @@ public class MySQLiteHelper {
      */
     public MySQLiteHelper(final Context ctx) {
         this.context = ctx;
-//        open();
+        open();
     }
     
     /**
@@ -89,7 +92,6 @@ public class MySQLiteHelper {
             if (this.mDbHelper == null) {
                 this.mDbHelper = new DatabaseHelper(this.context);
             }
-            Log.e("OPEN", mDb.toString());
             this.mDb = this.mDbHelper.getWritableDatabase();
             
             if (this.mDb.isReadOnly() || this.mDb.isDbLockedByOtherThreads() || this.mDb.isDbLockedByCurrentThread()) {
@@ -144,6 +146,7 @@ public class MySQLiteHelper {
      * @return rowId or -1 if failed
      */
     public void addMeasurement(Measurement measure){
+    	open();
         Log.d("addMeasurement", measure.toString());
  
         // 2. create ContentValues to add key "column"/value
@@ -164,29 +167,29 @@ public class MySQLiteHelper {
     
     
     
-  // Get All Measurements
-  public List<Measurement> getAllMeasurements() {
-	  
-      List<Measurement> measurements = new LinkedList<Measurement>();
-      // 1. build the query
-      String query = "SELECT rowid _id,* FROM " + MEASUREMENT_TABLE;
-      // 2. get reference to writable DB
-      Cursor cursor = mDb.rawQuery(query, null);
-//      // 3. go over each row, build measurement and add it to list
-      if (cursor.moveToFirst()) {
-          do {
-        	  final Measurement measurement = Measurement.create(cursor);
-        	  Log.e("Blah1", "" + measurement.getTimestamp());
-              measurements.add(measurement);
-          } while (cursor.moveToNext());
-      }
-      
-      Log.e("getAllMeasurements()", measurements.toString());
-	      
-	      return measurements;
-	  }
-	    
-     
+//  // Get All Measurements
+//  public List<Measurement> getAllMeasurements() {
+//	  
+//      List<Measurement> measurements = new LinkedList<Measurement>();
+//      // 1. build the query
+//      String query = "SELECT rowid _id,* FROM " + MEASUREMENT_TABLE;
+//      // 2. get reference to writable DB
+//      Cursor cursor = this.mDb.rawQuery(query, null);
+////      // 3. go over each row, build measurement and add it to list
+//      if (cursor.moveToFirst()) {
+//          do {
+//        	  final Measurement measurement = Measurement.create(cursor);
+//        	  Log.e("Blah1", "" + measurement.getTimestamp());
+//              measurements.add(measurement);
+//          } while (cursor.moveToNext());
+//      }
+//      
+//      Log.e("getAllMeasurements()", measurements.toString());
+//	      
+//	      return measurements;
+//	  }
+//	    
+//     
   
     
   

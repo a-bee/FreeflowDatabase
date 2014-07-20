@@ -2,11 +2,14 @@ package com.sqldatabase;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.sqldatabase.R;
 import com.sqldatabase.model.Measurement;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,8 +37,10 @@ public class displayDataActivity extends Activity {
  
 	final Activity thisActivity = this;
 	private final Context context = this;
-	final MySQLiteHelper mDbHelper = new MySQLiteHelper(this);
+	MySQLiteHelper db;
 	 
+	
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,14 +53,25 @@ public class displayDataActivity extends Activity {
         setupTable(rootView, m2);
         Measurement m3 = new Measurement((float) 14.0, new Date());
         setupTable(rootView, m3);
+        List<Measurement> measurements = new LinkedList<Measurement>();
+        db = new MySQLiteHelper(this);
+        measurements = getAllMeasurements(db);
         
     }
+    
+    
     
     @Override    
     protected void onDestroy() {        
         super.onDestroy();
-        mDbHelper.close();
+        db.close();
     }
+    
+    @Override
+    protected void onPause(){
+    	super.onPause();
+    	db.close();
+  }
     
     
     /**
@@ -69,6 +85,29 @@ public class displayDataActivity extends Activity {
         final TextView t2 = (TextView) view.findViewById(R.id.date);
         t2.setText(formattedDate);
     }
+    
+    
+    // Get All Measurements
+    public List<Measurement> getAllMeasurements(MySQLiteHelper dbHelper) {
+    	dbHelper.open();
+        List<Measurement> measurements = new LinkedList<Measurement>();
+        // 1. build the query
+        String query = "SELECT rowid _id,* FROM " + dbHelper.MEASUREMENT_TABLE;
+        // 2. get reference to writable DB
+        Cursor cursor = dbHelper.get_mDb().rawQuery(query, null);
+//        // 3. go over each row, build measurement and add it to list
+        if (cursor.moveToFirst()) {
+            do {
+          	  final Measurement measurement = Measurement.create(cursor);
+          	  Log.e("Blah1", "" + measurement.getTimestamp());
+                measurements.add(measurement);
+            } while (cursor.moveToNext());
+        }
+        
+        Log.e("getAllMeasurements()", measurements.toString());
+  	      
+  	      return measurements;
+  	  }
     
     
 
