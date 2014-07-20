@@ -35,12 +35,12 @@ public class MySQLiteHelper {
  
     //private SQLiteDatabase mDb;
     private SQLiteDatabase mDb;
-    private DatabaseHelper mDbHelper;
+    public DatabaseHelper mDbHelper;
     private boolean open = false;
     private Context context;
     
     
-    private static class DatabaseHelper extends SQLiteOpenHelper {
+    public static class DatabaseHelper extends SQLiteOpenHelper {
 	    
 	    DatabaseHelper(final Context context) {
 	        super(context, DATABASE_NAME, null, DATABASE_VERSION);  
@@ -59,6 +59,7 @@ public class MySQLiteHelper {
 	        db.execSQL("DROP TABLE IF EXISTS measurements");
 //	        this.onCreate(db);
 	    }
+	   
 	    
     }
    
@@ -82,7 +83,7 @@ public class MySQLiteHelper {
      * @throws SQLException
      *             if the database could be neither opened or created
      */
-    private MySQLiteHelper open() throws SQLException {
+    public MySQLiteHelper open() throws SQLException {
         Log.d("OPEN", "open database");
         try {
             if (this.mDbHelper == null) {
@@ -151,12 +152,12 @@ public class MySQLiteHelper {
         values.put(KEY_DATE, measure.getTimestamp() != null ? measure.getTimestamp().getTime() : System.currentTimeMillis());
  
         // 3. insert
-        mDb.insert(MEASUREMENT_TABLE, // table
+        this.mDb.insert(MEASUREMENT_TABLE, // table
                 null, //nullColumnHack
                 values); // key/value -> keys = column names/ values = column values
  
         // 4. close
-        mDb.close(); 
+        this.mDb.close(); 
     }
 
    
