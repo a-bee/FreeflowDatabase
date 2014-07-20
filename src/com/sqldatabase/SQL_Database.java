@@ -29,13 +29,10 @@ public class SQL_Database extends Activity {
         List<Measurement> measurements = new LinkedList<Measurement>();
     	db = new MySQLiteHelper(this);
         setContentView(R.layout.activity_sql__database);
-//        db.open();
         
         db.addMeasurement(new Measurement((float) 14.0, new Date()));
         db.addMeasurement(new Measurement((float) 11.0, new Date()));
-//        db.addMeasurement(new Measurement((float) 10.0, new Date()));
-        
-//        measurements = getAllMeasurements(db);
+        db.addMeasurement(new Measurement((float) 10.0, new Date()));
 
         displayButton();
     }
@@ -48,11 +45,11 @@ public class SQL_Database extends Activity {
     }
     
     
-//    @Override
-//    protected void onDestroy(){
-//    	super.onDestroy();
-//    	db.close();
-//    }
+    @Override
+    protected void onDestroy(){
+    	super.onDestroy();
+    	db.close();
+    }
     
 
   //Button that starts a new activity that displays data
@@ -72,6 +69,4 @@ public class SQL_Database extends Activity {
     }
     
     
-
- 
 }

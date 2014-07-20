@@ -13,16 +13,11 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
  
@@ -38,6 +33,7 @@ public class displayDataActivity extends Activity {
 	final Activity thisActivity = this;
 	private final Context context = this;
 	MySQLiteHelper db;
+	TableLayout mainTable;
 	 
 	
 	
@@ -45,18 +41,12 @@ public class displayDataActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LayoutInflater li=getLayoutInflater();
-        View rootView=li.inflate(R.layout.data_layout,null);
+        View rootView=li.inflate(R.layout.data_layout, null);
         setContentView(rootView);
-        Measurement m = new Measurement((float) 12.0, new Date());
-        setupTable(rootView, m);
-        Measurement m2 = new Measurement((float) 13.0, new Date());
-        setupTable(rootView, m2);
-        Measurement m3 = new Measurement((float) 14.0, new Date());
-        setupTable(rootView, m3);
         List<Measurement> measurements = new LinkedList<Measurement>();
         db = new MySQLiteHelper(this);
         measurements = getAllMeasurements(db);
-        
+        TabulateDatabase(rootView, measurements);
     }
     
     
@@ -73,19 +63,7 @@ public class displayDataActivity extends Activity {
     	db.close();
   }
     
-    
-    /**
-     * Formats and displays the date
-     * 
-     * @param view
-     * @param circumference
-     */
-    private void displayDate(final View view, final Date timestamp) {
-        final String formattedDate = TIME_AND_DATE_FORMAT.format(timestamp);
-        final TextView t2 = (TextView) view.findViewById(R.id.date);
-        t2.setText(formattedDate);
-    }
-    
+
     
     // Get All Measurements
     public List<Measurement> getAllMeasurements(MySQLiteHelper dbHelper) {
@@ -111,19 +89,59 @@ public class displayDataActivity extends Activity {
     
     
 
-    /**
-     * Converts, formats and displays the weight measure
-     * 
-     * @param view
-     * @param circumference
-     */
-    private void displayMeasurement(final View view, final Measurement measurement) {
-        final TextView t = (TextView) view.findViewById(R.id.measure);
-        t.setText(measurement.getValue() + " kg");
-    }
-  
     
-    TableLayout mainTable;
+    private void TabulateDatabase(View v, List<Measurement> measurements){
+    	
+        mainTable = (TableLayout) v.findViewById(R.id.maintable);
+    	
+    	for (int i = 0; i < measurements.size(); i++){
+            
+            // Create a TableRow and give it an ID
+            TableRow tr = new TableRow(this);
+            tr.setId(100+i);
+            tr.setLayoutParams(new TableRow.LayoutParams(
+                    TableRow.LayoutParams.MATCH_PARENT,
+                    TableRow.LayoutParams.WRAP_CONTENT));
+  
+            // Create a TextView for column 1
+            TextView col1 = new TextView(this);
+            col1.setId(200+i);
+            col1.setText("" + measurements.get(i).getTimestampString());
+            col1.setPadding(0,0,60,0);    
+            col1.setGravity(Gravity.LEFT);
+            col1.setTextColor(Color.BLACK);
+            col1.setLayoutParams(new TableRow.LayoutParams(
+                    TableRow.LayoutParams.MATCH_PARENT,
+                    TableRow.LayoutParams.WRAP_CONTENT));
+            tr.addView(col1);
+  
+            // Create a TextView for column 2
+            TextView col2 = new TextView(this);
+            col2.setId(300 + i);
+            col2.setText(measurements.get(i).getValue() + " kg");
+            col2.setPadding(0,0,20,0);   
+            col2.setGravity(Gravity.CENTER_HORIZONTAL);
+            col2.setTextColor(Color.BLACK);
+            col2.setLayoutParams(new TableRow.LayoutParams(
+                    TableRow.LayoutParams.MATCH_PARENT,
+                    TableRow.LayoutParams.WRAP_CONTENT, 1f));
+      
+            col2.setHorizontallyScrolling(false);
+            col2.setMaxLines(100);
+            col2.setLayoutParams(new TableRow.LayoutParams(
+                    TableRow.LayoutParams.MATCH_PARENT,
+                    TableRow.LayoutParams.WRAP_CONTENT, 1f));
+            tr.addView(col2);
+            
+            // Add the TableRow to the TableLayout
+            mainTable.addView(tr, new TableLayout.LayoutParams(
+                    TableLayout.LayoutParams.MATCH_PARENT,
+                    TableLayout.LayoutParams.WRAP_CONTENT));
+        }
+    }
+    
+    
+    
     static int i = 0;
     private void setupTable(View v, Measurement value1){
     	
